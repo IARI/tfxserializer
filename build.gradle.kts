@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.julianjarecki"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-alpha-1"
 
 repositories {
     mavenCentral()
@@ -31,6 +31,9 @@ tasks {
     val artifactName = project.name
     val artifactGroup = project.group.toString()
     val artifactVersion = project.version.toString()
+    val gitHubRepo = "IARI/tfxserializer"
+    val gitURL = "https://github.com/$gitHubRepo"
+    val issueURL = "$gitURL/issues"
 
     publishing {
         publications {
@@ -63,9 +66,9 @@ tasks {
                         }
                     }
                     scm {
-                        connection.set("scm:git:git://example.com/my-library.git")
-                        developerConnection.set("scm:git:ssh://example.com/my-library.git")
-                        url.set("http://example.com/my-library/")
+                        //connection.set("scm:git:git://example.com/my-library.git")
+                        //developerConnection.set("scm:git:ssh://example.com/my-library.git")
+                        url.set(gitURL)
                     }
                 }
             }
@@ -81,16 +84,16 @@ tasks {
 
         pkg.apply {
             repo = "maven"
-            name = rootProject.name
-            //userOrg = "serpro69"
-            //githubRepo = githubRepo
-            //vcsUrl = pomScmUrl
+            name = artifactName
+            //userOrg = "julianjarecki"
+            githubRepo = gitHubRepo
+            vcsUrl = gitURL
             description = "a collection of kotlin serializers for javafx properties and utilities to use them with tornadofx"
             setLabels("kotlin", "tornadofx", "javafx", "serialization", "utils")
             setLicenses("Apache-2.0")
             desc = description
-            //websiteUrl = pomUrl
-            //issueTrackerUrl = pomIssueUrl
+            websiteUrl = gitURL
+            issueTrackerUrl = issueURL
             //githubReleaseNotesFile = githubReadme
 
             version.apply {

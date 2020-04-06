@@ -193,12 +193,9 @@ fun File.replaceExtension(extWithDot: String): File = File(absolutePathWithoutEx
 val File.absolutePathWithoutExtension get() = absolutePath.substringBeforeLast(".")
 fun File.appendSuffix(suffix: String) = File("${absolutePathWithoutExtension}$suffix.$extension")
 
-
-val labelsExtension = "labels"
 val imageExtensions = listOf("jpg", "gif", "png", "svg")
 val pptFilter = FileChooser.ExtensionFilter("Powerpoint Slides (*.ppt, *.pptx)", "*.ppt", "*.pptx")
 val imageFilter = FileChooser.ExtensionFilter("Image Files", *imageExtensions.map { "*.$it" }.toTypedArray())
 val exeFilter = FileChooser.ExtensionFilter("Windows Executable (*.exe)", "*.exe")
 val zipFileFilter = FileChooser.ExtensionFilter("Zip Archive (*.zip)", "*.zip")
-val labelsFilter = FileChooser.ExtensionFilter("Labels Document (*.$labelsExtension)", "*.$labelsExtension")
 val anyFilter = FileChooser.ExtensionFilter("Any File", "*")
