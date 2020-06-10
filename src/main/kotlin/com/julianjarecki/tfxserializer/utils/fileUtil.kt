@@ -22,9 +22,12 @@ import kotlin.reflect.full.createInstance
 inline val String.toPath get() = Paths.get(this)
 inline val String.toFile get() = File(this)
 
+/**
+ * shortcut for thy system property "user.home" converted to a File
+ */
 val userHomeDir = System.getProperty("user.home").toFile
+
 //val userDocDir =  Shell32Util.getFolderPath(ShlObj.CSIDL_PERSONAL)
-//System.getProperty("user.home").toFile
 
 fun <T> ObservableValue<T>.resolve(child: ObservableValue<String>) = stringBinding(child) {
     it?.run {
@@ -48,14 +51,17 @@ fun File.resolveR(vararg pathElements: String) = pathElements.fold(this) { paren
 
 
 /**
- * @param callback will only be called, when deserialization worked.
+ * tries to deserialize data from a File given an explicit deserializer
+ * in case
+ *
+ * @param onLoaded will only be called, when deserialization worked.
  */
 inline fun <reified T : Any> File.loadSettings(name: String,
                                                serializer: DeserializationStrategy<T>,
                                                strict: Boolean = false,
                                                default: () -> T = T::class::createInstance,
                                                log: Logger = Logger.getGlobal(),
-                                               callback: T.() -> Unit = {}): T = run {
+                                               onLoaded: T.() -> Unit = {}): T = run {
     var result: T? = null
     if (isFile && canRead()) {
         val timestr = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(":", "")
@@ -87,7 +93,7 @@ inline fun <reified T : Any> File.loadSettings(name: String,
         }
     }
     // if the result was loaded properly, apply callback and return, otherwise invoke tefault method.
-    return result?.apply(callback) ?: default.invoke()
+    return result?.apply(onLoaded) ?: default.invoke()
 }
 
 

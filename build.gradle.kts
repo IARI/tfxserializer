@@ -1,8 +1,8 @@
 plugins {
     id("com.jfrog.bintray") version "1.8.4"
     `maven-publish`
-    kotlin("jvm") version "1.3.71"
-    id("kotlinx-serialization") version "1.3.71"
+    kotlin("jvm") version "1.3.72"
+    id("kotlinx-serialization") version "1.3.72"
 }
 
 group = "com.julianjarecki"

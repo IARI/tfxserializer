@@ -2,23 +2,6 @@ package com.julianjarecki.tfxserializer.utils
 
 import javafx.scene.control.IndexRange
 
-enum class IndentStrategy {
-    None {
-        override fun getIndent(source: String): Int = 0
-        override fun applyTo(input: String, source: String) = input
-    },
-    FirstLine {
-        override fun getIndent(source: String): Int = source.lineSequence().first().takeWhile { it.isWhitespace() }.length
-    },
-    Shortest {
-        override fun getIndent(source: String): Int = source.lineSequence()
-                .map { it.takeWhile { it.isWhitespace() }.length }.min() ?: 0
-    };
-
-    open fun applyTo(input: String, source: String) = getIndent(source).let(" "::repeat).let { input.replaceIndent(it) }
-    abstract fun getIndent(source: String): Int
-}
-
 val String.indentWidth: Int get() = indexOfFirst { !it.isWhitespace() }.let { if (it == -1) length else it }
 
 fun MatchResult.replaceSubgroup(groupId: String, replacer: (String) -> String) = groups
