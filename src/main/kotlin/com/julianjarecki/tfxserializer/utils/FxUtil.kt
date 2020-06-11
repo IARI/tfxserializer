@@ -3,6 +3,7 @@ package com.julianjarecki.tfxserializer.utils
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
 import javafx.event.EventTarget
 import javafx.scene.Node
 import javafx.scene.control.*
@@ -338,3 +339,34 @@ infix fun <T> Property<T>.swapValueWith(other: Property<T>) {
         other.value = it
     }
 }
+
+
+fun <T, R> Property<R>.bindBidirectional(other: Property<T>, f1: (R, T, T) -> R, f2: (T, R, R) -> T) =
+    object : BidirectionalConversionBinding<T, R>(other, this) {
+        override fun convertStoT(oldT: R, oldS: T, s: T) = f1(oldT, oldS, s)
+        override fun convertTtoS(oldS: T, oldT: R, t: R) = f2(oldS, oldT, t)
+    }.apply {
+        bind()
+    }
+
+fun <T, R> Property<R>.bindBidirectional(other: Property<T>, f1: (T) -> R, f2: (R) -> T) =
+    object : BidirectionalConversionBinding<T, R>(other, this) {
+        override fun convertStoT(oldT: R, oldS: T, s: T) = f1(s)
+        override fun convertTtoS(oldS: T, oldT: R, t: R) = f2(t)
+    }.apply {
+        bind()
+    }
+
+
+fun <T> Property<Number>.bindCount(listProperty: Property<ObservableList<T>>, constructor: (Int)->T) =
+    bindBidirectional(listProperty, { _, _, v -> v.size }) { oldV, oldT, t ->
+        val newSize = t.toInt()
+        oldV.apply {
+            val sizeDiff = newSize - size
+            if (sizeDiff < 0) {
+                remove(newSize, size)
+            } else for (i in size until newSize) {
+                add(constructor(i))
+            }
+        }
+    }

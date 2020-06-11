@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 
+
 abstract class BidirectionalConversionBinding<S, T> protected constructor(
     protected val propertyS: Property<S>,
     protected val propertyT: Property<T>
@@ -14,8 +15,8 @@ abstract class BidirectionalConversionBinding<S, T> protected constructor(
     }
 
     val updating = SimpleBooleanProperty()
-    abstract fun convertStoT(s: S): T
-    abstract fun convertTtoS(t: T): S
+    abstract fun convertStoT(oldT: T, oldS: S, s: S): T
+    abstract fun convertTtoS(oldS: S, oldT: T, t: T): S
     val listenerS: ChangeListener<S> by lazy {
         createChangeListenerSetting(propertyT, ::convertStoT)
     }
@@ -24,26 +25,28 @@ abstract class BidirectionalConversionBinding<S, T> protected constructor(
     }
 
     open fun bind() {
-        propertyT.value = convertStoT(propertyS.value)
+        // change propertyT based on value from propertyS
+        triggerUpdate()
         propertyS.addListener(listenerS)
         propertyT.addListener(listenerT)
     }
 
     fun triggerUpdate() {
-        updating.guarded {
-            propertyT.value = convertStoT(propertyS.value)
-        }
+        // change propertyT based on value from propertyS
+        listenerS.changed(propertyS, propertyS.value, propertyS.value)
     }
 
     protected fun <T1, T2> createChangeListenerSetting(
         changeProp: Property<T2>,
-        converter: (T1) -> T2
-    ): ChangeListener<T1> =
-        ChangeListener { _: ObservableValue<out T1>?, _: T1, new: T1 ->
+        converter: (T2, T1, T1) -> T2
+    ): ChangeListener<T1> = object : ChangeListener<T1> {
+        override fun changed(observable: ObservableValue<out T1>?, oldValue: T1, newValue: T1) {
             updating.guarded {
-                changeProp.value = converter.invoke(new)
+                val oldT2 = changeProp.value
+                changeProp.value = converter.invoke(oldT2, oldValue, newValue)
             }
         }
+    }
 
     open fun unbind() {
         propertyS.removeListener(listenerS)
