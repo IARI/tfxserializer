@@ -358,7 +358,7 @@ fun <T, R> Property<R>.bindBidirectional(other: Property<T>, f1: (T) -> R, f2: (
     }
 
 
-fun <T> Property<Number>.bindCount(listProperty: Property<ObservableList<T>>, constructor: (Int)->T) =
+fun <T> Property<Number>.bindCount(listProperty: Property<ObservableList<T>>, constructor: (Int) -> T) =
     bindBidirectional(listProperty, { _, _, v -> v.size }) { oldV, oldT, t ->
         val newSize = t.toInt()
         oldV.apply {
